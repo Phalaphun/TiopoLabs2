@@ -2,7 +2,7 @@
 
 namespace Laba1
 {
-    internal class Program
+    public class Program
     {
         static void Main(string[] args)
         {
@@ -51,7 +51,7 @@ namespace Laba1
             }
             sw.Stop();
             Log($"\nСортировка пузырьком окончена. Время: {sw.ElapsedTicks} тиков\n");
-            Log($"Сортировка пузырьком окончена. Время: {sw.ElapsedTicks} тиков", "log_time.txt");
+            Log($"Сортировка пузырьком окончена. Время: {sw.ElapsedTicks} тиков или {sw.ElapsedMilliseconds} миллисекунд", "log_time.txt");
         }
 
         public static void Swap<T>(ref T t1, ref T t2) where T : IComparable<T>
@@ -75,9 +75,9 @@ namespace Laba1
             MergeSortImp(array, buffer, 0, array.Length - 1);
             sw.Stop();
             Log($"\nСортировка слиянием окончена. Время: {sw.ElapsedTicks} тиков\n");
-            Log($"Сортировка слиянием окончена. Время: {sw.ElapsedTicks} тиков", "log_time.txt");
+            Log($"Сортировка слиянием окончена. Время: {sw.ElapsedTicks} тиков или {sw.ElapsedMilliseconds} миллисекунд", "log_time.txt");
         }
-        private static void MergeSortImp<T>(T[] array, T[] buffer, int l, int r) where T : IComparable<T>
+        public static void MergeSortImp<T>(T[] array, T[] buffer, int l, int r) where T : IComparable<T>
         {
             if (l < r)
             {
@@ -118,13 +118,15 @@ namespace Laba1
 
         public static void Log(string text, string path = "log.txt")
         {
-            using (StreamWriter sw = new StreamWriter(path,true))
+            #if !StopLog
+            using (StreamWriter sw = new StreamWriter(path, true))
             {
                 sw.WriteLine(text);
                 sw.Close();
-            }
+            } 
+            #endif
         }
-        private static string GetArrayAsAString<T>(T[] array)
+        public static string GetArrayAsAString<T>(T[] array)
         {
             string s = "";
             for (int i = 0; i < array.Length; i++)
@@ -133,7 +135,7 @@ namespace Laba1
             }
             return s;
         }
-        private static string GetPartOfAnArrayAsAString<T>(T[] array, int l, int r)
+        public static string GetPartOfAnArrayAsAString<T>(T[] array, int l, int r)
         {
             string s = "";
             for (int i = l; i <= r; i++)
