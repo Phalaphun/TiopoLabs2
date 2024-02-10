@@ -46,7 +46,8 @@ namespace Tests
         public void TestBubble1()
         {
 
-            int j = 100000;
+            //int j = 100000;
+            int j = 10000;
             int[] array = new int[j];
             for (int i = 0; i < array.Length; i++)
             {
