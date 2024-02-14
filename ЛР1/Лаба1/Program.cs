@@ -1,4 +1,5 @@
 ﻿#define StopLog
+using System.ComponentModel.Design;
 using System.Diagnostics;
 
 namespace Laba1
@@ -197,11 +198,12 @@ namespace Laba1
             Console.WriteLine(GetArrayAsAString(array));
         }
 
-        static Queue<string> queue= new Queue<string>();
-        //static Queue<string> queueZapis = new Queue<string>();
-        //static Queue<string> queueChenie = new Queue<string>();
+        
+        static Queue<string> queueZapis = new Queue<string>();
+        static Queue<string> queueChenie = new Queue<string>();
         static Task a;
         static Task b;
+        static Random rnd = new Random(6284);
         static void Start()
         {
             Init();
@@ -216,14 +218,21 @@ namespace Laba1
         {
             while (true)
             {
-                lock (queue)
+                if (queueChenie.Count == 0)
                 {
-                    if (queue.Count != 0)
+                    lock (queueZapis)
                     {
-                        Console.WriteLine("Типо запись: " + queue.Dequeue());
+                        
+                        Queue<string> temp = queueChenie;
+                        queueChenie = queueZapis;
+                        queueZapis = temp;      
                     }
                 }
-                if (b.IsCompleted & queue.Count == 0)
+                if (queueChenie.Count != 0)
+                {
+                    Console.WriteLine("Типо запись: " + queueChenie.Dequeue());
+                }
+                if (b.IsCompleted & queueChenie.Count == 0)
                 {
                     return;
                 }
@@ -233,14 +242,14 @@ namespace Laba1
         {
             for (int i = 0; i < 1000; i++)
             {
-                lock (queue)
+                lock (queueZapis)
                 {
-                    queue.Enqueue($"НЯНЯНЯ: {i}");
+                    queueZapis.Enqueue($"НЯНЯНЯ: {i}");
                     Console.WriteLine("Типо внесена на запись");
                 }
-                if (i % 10 == 0)
+                if (true) //i % 10 == 0
                 {
-                    Thread.Sleep(1000);
+                    Thread.Sleep(rnd.Next(0,10));
                 }
             }
         }
