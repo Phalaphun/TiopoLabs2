@@ -1,26 +1,26 @@
 ﻿namespace Laba1
 {
 
-    public class TreeNode
+    public class TreeNode<T> where T:IComparable<T>
     {
-        public TreeNode(int data)
+        public TreeNode(T data)
         {
             Data = data;
         }
 
         //данные
-        public int Data { get; set; }
+        public T Data { get; set; }
 
         //левая ветка дерева
-        public TreeNode Left { get; set; }
+        public TreeNode<T> Left { get; set; }
 
         //правая ветка дерева
-        public TreeNode Right { get; set; }
+        public TreeNode<T> Right { get; set; }
 
         //рекурсивное добавление узла в дерево
-        public void Insert(TreeNode node)
+        public void Insert(TreeNode<T> node)
         {
-            if (node.Data < Data)
+            if (node.Data.CompareTo(Data) < 0)// node.Data < Data
             {
                 if (Left == null)
                 {
@@ -45,11 +45,11 @@
         }
 
         //преобразование дерева в отсортированный массив
-        public int[] Transform(List<int> elements = null)
+        public T[] Transform(List<T> elements = null)
         {
             if (elements == null)
             {
-                elements = new List<int>();
+                elements = new List<T>();
             }
 
             if (Left != null)
@@ -71,12 +71,12 @@
     class TestTreeNode
     {
         //метод для сортировки с помощью бинарного дерева (мб это бинарная сортировка)
-        private static int[] TreeSort(int[] array)
+        public static T[] TreeSort<T>(T[] array) where T:IComparable<T>
         {
-            var treeNode = new TreeNode(array[0]);
+            var treeNode = new TreeNode<T>(array[0]);
             for (int i = 1; i < array.Length; i++)
             {
-                treeNode.Insert(new TreeNode(array[i]));
+                treeNode.Insert(new TreeNode<T>(array[i]));
             }
 
             return treeNode.Transform();
