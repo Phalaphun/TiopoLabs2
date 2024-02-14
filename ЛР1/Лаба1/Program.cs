@@ -12,30 +12,6 @@ namespace Laba1
         static Random rnd = new Random(6284);
         static void Main(string[] args)
         {
-            //Start();
-            #region Old
-            //int[] someArray = new int[] { 1, 2, 4, 3, 8, 5, 7, 6, 9, 0 };
-            //PrintArray(someArray);
-
-
-            ////BubbleSort(someArray);
-            ////MergeSort(someArray);
-            ////TreeSort(ref someArray);
-            ////ShakerSort(someArray);
-
-            //PrintArray(someArray);
-
-
-            //double[] someArray2 = new double[] { 1, 2, 3, 4.5, 6, 0, 1.1 };
-            //PrintArray(someArray2);
-
-
-            ////BubbleSort(someArray2);
-            ////MergeSort(someArray2);
-
-
-            //PrintArray(someArray2);
-            #endregion
             for (int j = 10; j < 10001; j*=10)
             {
                 int[] array1 = new int[j];
@@ -323,8 +299,8 @@ namespace Laba1
             Console.WriteLine(GetArrayAsAString(array));
         }
 
-        
 
+        #region testThreadsTasks
         //static void Start()
         //{
         //    Init();
@@ -343,7 +319,7 @@ namespace Laba1
         //        {
         //            lock (queueZapis)
         //            {
-                        
+
         //                Queue<string> temp = queueChenie;
         //                queueChenie = queueZapis;
         //                queueZapis = temp;      
@@ -386,6 +362,7 @@ namespace Laba1
         //    b.Start();
         //    a.Start();
         //}
+        #endregion old
     }
 
 }
