@@ -201,15 +201,15 @@ namespace Laba1
         
         static Queue<string> queueZapis = new Queue<string>();
         static Queue<string> queueChenie = new Queue<string>();
-        static Task a;
-        static Task b;
+        static Thread a;
+        static Thread b;
         static Random rnd = new Random(6284);
         static void Start()
         {
             Init();
 
-            b.Wait();
-            a.Wait();
+            b.Join();
+            a.Join();
 
         }
 
@@ -232,7 +232,7 @@ namespace Laba1
                 {
                     Console.WriteLine("Типо запись: " + queueChenie.Dequeue());
                 }
-                if (b.IsCompleted & queueChenie.Count == 0)
+                if (!b.IsAlive & queueChenie.Count == 0)
                 {
                     return;
                 }
@@ -258,8 +258,10 @@ namespace Laba1
             //Task.Run(() => { Bred(); });
             //Task.Run(() => { Test(); });
 
-            b = new Task(() => { Bred(); });
-            a = new Task(() => { Test(); });
+            b = new Thread(() => { Bred(); });
+            a = new Thread(() => { Test(); });
+            b.Priority = ThreadPriority.Highest;
+            a.Priority = ThreadPriority.Lowest;
             b.Start();
             a.Start();
         }
