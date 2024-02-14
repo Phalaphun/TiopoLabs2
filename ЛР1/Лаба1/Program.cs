@@ -1,4 +1,4 @@
-﻿#define StopLog
+﻿//#define StopLog
 using System.ComponentModel.Design;
 using System.Diagnostics;
 
@@ -6,9 +6,15 @@ namespace Laba1
 {
     public class Program
     {
+        static Queue<string> queueSort = new Queue<string>();
+        static Queue<string> queueLog = new Queue<string>();
+        static Task sort;
+        static Task write;
+        static Random rnd = new Random(6284);
         static void Main(string[] args)
         {
-            Start();
+            //Start();
+            #region Old
             //int[] someArray = new int[] { 1, 2, 4, 3, 8, 5, 7, 6, 9, 0 };
             //PrintArray(someArray);
 
@@ -30,7 +36,29 @@ namespace Laba1
 
 
             //PrintArray(someArray2);
+            #endregion
+            for (int j = 10; j < 10001; j*=10)
+            {
+                int[] array1 = new int[j];
+                int[] array2 = new int[j];
+                int[] array3 = new int[j];
+                int[] array4 = new int[j];
+                for (int i = 0; i < j; i++)
+                {
+                    var a = rnd.Next(1,10000);
+                    array1[i] = a;
+                    array2[i] = a;
+                    array3[i] = a;
+                    array4[i] = a;
+                }
+                sort = new Task(() => BubbleSort(array1));
+                write = new Task(() => Log());
+                sort.Start();
+                write.Start();
+                sort.Wait();
+                write.Wait();
 
+            }
         }
 
 
@@ -38,24 +66,35 @@ namespace Laba1
         {
             Stopwatch sw = Stopwatch.StartNew();
             if (array.Length == 0) return;
-            Log($"Сортировка пузырьком {array.Length} начата \n");
-            Log($"Сортировка пузырьком {array.Length} начата ", "log_time.txt");
+            lock (queueSort)
+            {
+                queueSort.Enqueue($"|Сортировка пузырьком {array.Length} начата\n");
+            }
             for (int i = 0; i < array.Length; i++)
             {
                 for (int j = 0; j < array.Length - 1 - i; j++)
                 {
                     if (array[j].CompareTo(array[j + 1]) > 0) // >=1 значит исходное следует за сравниваемым
                     {
-                        Log($"Сравниваются два элемента: {array[j]} и {array[j + 1]}");
+                        lock (queueSort)
+                        {
+                            queueSort.Enqueue($"Сравниваются два элемента: {array[j]} и {array[j + 1]}");
+                        }
                         Swap(ref array[j], ref array[j + 1]);
 
                     }
                 }
-                Log($"Результат итерации {GetArrayAsAString(array)}");
+                lock (queueSort)
+                {
+                    queueSort.Enqueue($"Результат итерации {GetArrayAsAString(array)}");
+                }
             }
             sw.Stop();
-            Log($"\nСортировка пузырьком окончена. Время: {sw.ElapsedTicks} тиков\n");
-            Log($"Сортировка пузырьком окончена. Время: {sw.ElapsedTicks} тиков или {sw.ElapsedMilliseconds} миллисекунд", "log_time.txt");
+            lock (queueSort)
+            {
+                queueSort.Enqueue($"|Сортировка пузырьком окончена. Время: {sw.ElapsedTicks} тиков или {sw.ElapsedMilliseconds} миллисекунд\n");
+            }
+            
         }
         public static void ShakerSort<T>(T[] array) where T : IComparable<T>
         {
@@ -103,21 +142,27 @@ namespace Laba1
             if (array.Length == 0) return;
 
             Stopwatch sw = Stopwatch.StartNew();
-            Log($"Сортировка слиянием {array.Length} начата \n");
-            Log($"Сортировка слиянием {array.Length} начата", "log_time.txt");
-
+            lock (queueSort)
+            {
+                queueSort.Enqueue($"|Сортировка слиянием {array.Length} начата\n");
+            }
             T[] buffer = new T[array.Length];
             MergeSortImp(array, buffer, 0, array.Length - 1);
             sw.Stop();
-            Log($"\nСортировка слиянием окончена. Время: {sw.ElapsedTicks} тиков\n");
-            Log($"Сортировка слиянием окончена. Время: {sw.ElapsedTicks} тиков или {sw.ElapsedMilliseconds} миллисекунд", "log_time.txt");
+            lock (queueSort)
+            {
+                queueSort.Enqueue($"|Сортировка слиянием окончена. Время: {sw.ElapsedTicks} тиков или {sw.ElapsedMilliseconds} миллисекунд");
+            }           
         }
         public static void MergeSortImp<T>(T[] array, T[] buffer, int l, int r) where T : IComparable<T>
         {
             if (l < r)
             {
                 int m = (l + r) / 2; // делю массив на 2 части
-                Log($"Произвожу деление на блоки: {GetPartOfAnArrayAsAString(array, l, m)} и {GetPartOfAnArrayAsAString(array, m + 1, r)} ");
+                lock (queueSort)
+                {
+                    queueSort.Enqueue($"Произвожу деление на блоки: {GetPartOfAnArrayAsAString(array, l, m)} и {GetPartOfAnArrayAsAString(array, m + 1, r)} ");
+                }
                 MergeSortImp(array, buffer, l, m); // отправляю сортироваться правую часть
                 //Log($"Результат работы над блоком {GetPartOfAnArrayAsAString(buffer, l, m)}");
                 MergeSortImp(array, buffer, m + 1, r); // отправляю сортироваться левую часть
@@ -142,7 +187,10 @@ namespace Laba1
                 {
                     array[i] = buffer[i];
                 }
-                Log($"Результат работы над блоком {GetPartOfAnArrayAsAString(buffer, l, r)}");
+                lock (queueSort)
+                {
+                    queueSort.Enqueue($"Результат работы над блоком {GetPartOfAnArrayAsAString(buffer, l, r)}");
+                }
                 //Log($"Результат итерации {GetArrayAsAString(array)}");
             }
 
@@ -165,14 +213,41 @@ namespace Laba1
 
 
 
-        public static void Log(string text, string path = "log.txt")
+        public static void Log()
         {
 #if !StopLog
-            using (StreamWriter sw = new StreamWriter(path, true))
+            using (StreamWriter sw2 = new StreamWriter("log2.txt", true))
             {
-                sw.WriteLine(text);
-                sw.Close();
-            } 
+                using (StreamWriter sw = new StreamWriter("log.txt", true))
+                {
+                    while (true)
+                    {
+                        if (queueLog.Count == 0)
+                        {
+                            lock (queueSort)
+                            {
+
+                                Queue<string> temp = queueLog;
+                                queueLog = queueSort;
+                                queueSort = temp;
+                            }
+                        }
+                        if (queueLog.Count != 0)
+                        {
+                            string a = queueLog.Dequeue();
+                            sw.WriteLine(a);
+                            if (a!=null && a[0] == '|')
+                                sw2.WriteLine(a);
+                        }
+                        if (sort.IsCompleted & queueLog.Count == 0)
+                        {
+                            sw.Close();
+                            sw2.Close();
+                            return;
+                        } 
+                    }
+                }
+            }
 #endif
         }
         public static string GetArrayAsAString<T>(T[] array)
@@ -199,72 +274,68 @@ namespace Laba1
         }
 
         
-        static Queue<string> queueZapis = new Queue<string>();
-        static Queue<string> queueChenie = new Queue<string>();
-        static Thread a;
-        static Thread b;
-        static Random rnd = new Random(6284);
-        static void Start()
-        {
-            Init();
 
-            b.Join();
-            a.Join();
+        //static void Start()
+        //{
+        //    Init();
 
-        }
+        //    b.Join();
+        //    a.Join();
+
+        //}
 
 
-        static void Test()
-        {
-            while (true)
-            {
-                if (queueChenie.Count == 0)
-                {
-                    lock (queueZapis)
-                    {
+        //static void Test()
+        //{
+        //    while (true)
+        //    {
+        //        if (queueChenie.Count == 0)
+        //        {
+        //            lock (queueZapis)
+        //            {
                         
-                        Queue<string> temp = queueChenie;
-                        queueChenie = queueZapis;
-                        queueZapis = temp;      
-                    }
-                }
-                if (queueChenie.Count != 0)
-                {
-                    Console.WriteLine("Типо запись: " + queueChenie.Dequeue());
-                }
-                if (!b.IsAlive & queueChenie.Count == 0)
-                {
-                    return;
-                }
-            }
-        }
-        static void Bred()
-        {
-            for (int i = 0; i < 1000; i++)
-            {
-                lock (queueZapis)
-                {
-                    queueZapis.Enqueue($"НЯНЯНЯ: {i}");
-                    Console.WriteLine("Типо внесена на запись");
-                }
-                if (true) //i % 10 == 0
-                {
-                    Thread.Sleep(rnd.Next(0,10));
-                }
-            }
-        }
-        static void Init()
-        {
-            //Task.Run(() => { Bred(); });
-            //Task.Run(() => { Test(); });
+        //                Queue<string> temp = queueChenie;
+        //                queueChenie = queueZapis;
+        //                queueZapis = temp;      
+        //            }
+        //        }
+        //        if (queueChenie.Count != 0)
+        //        {
+        //            Console.WriteLine("Типо запись: " + queueChenie.Dequeue());
+        //        }
+        //        if (!b.IsAlive & queueChenie.Count == 0)
+        //        {
+        //            return;
+        //        }
+        //    }
+        //}
+        //static void Bred()
+        //{
+        //    for (int i = 0; i < 1000; i++)
+        //    {
+        //        lock (queueZapis)
+        //        {
+        //            queueZapis.Enqueue($"НЯНЯНЯ: {i}");
+        //            Console.WriteLine("Типо внесена на запись");
+        //        }
+        //        if (true) //i % 10 == 0
+        //        {
+        //            Thread.Sleep(rnd.Next(0,10));
+        //        }
+        //    }
+        //}
+        //static void Init()
+        //{
+        //    //Task.Run(() => { Bred(); });
+        //    //Task.Run(() => { Test(); });
 
-            b = new Thread(() => { Bred(); });
-            a = new Thread(() => { Test(); });
-            b.Priority = ThreadPriority.Highest;
-            a.Priority = ThreadPriority.Lowest;
-            b.Start();
-            a.Start();
-        }
+        //    b = new Thread(() => { Bred(); });
+        //    a = new Thread(() => { Test(); });
+        //    b.Priority = ThreadPriority.Highest;
+        //    a.Priority = ThreadPriority.Lowest;
+        //    b.Start();
+        //    a.Start();
+        //}
     }
 
 }
