@@ -1,13 +1,12 @@
 ﻿//#define StopLog
-using System.ComponentModel.Design;
 using System.Diagnostics;
 
 namespace Laba1
 {
     public class Program
     {
-        static Queue<string> queueSort = new Queue<string>();
-        static Queue<string> queueLog = new Queue<string>();
+        static List<string> queueSort = new List<string>();
+        static List<string> queueLog = new List<string>();
         static Task sort;
         static Task write;
         static Random rnd = new Random(6284);
@@ -51,12 +50,36 @@ namespace Laba1
                     array3[i] = a;
                     array4[i] = a;
                 }
-                sort = new Task(() => BubbleSort(array1));
+
+                //sort = new Task(() => BubbleSort(array1));
+                //write = new Task(() => Log());
+                //sort.Start();
+                //write.Start();
+                //sort.Wait();
+                //write.Wait();
+
+                sort = new Task(() => MergeSort(array2));
                 write = new Task(() => Log());
                 sort.Start();
                 write.Start();
                 sort.Wait();
                 write.Wait();
+
+                sort = new Task(() => TreeSort(ref array3));
+                write = new Task(() => Log());
+                sort.Start();
+                write.Start();
+                sort.Wait();
+                write.Wait();
+
+
+                //sort = new Task(() => ShakerSort(array4));
+                //write = new Task(() => Log());
+                //sort.Start();
+                //write.Start();
+                //sort.Wait();
+                //write.Wait();
+
 
             }
         }
@@ -68,7 +91,7 @@ namespace Laba1
             if (array.Length == 0) return;
             lock (queueSort)
             {
-                queueSort.Enqueue($"|Сортировка пузырьком {array.Length} начата\n");
+                queueSort.Add($"|Сортировка пузырьком {array.Length} начата\n");
             }
             for (int i = 0; i < array.Length; i++)
             {
@@ -78,7 +101,7 @@ namespace Laba1
                     {
                         lock (queueSort)
                         {
-                            queueSort.Enqueue($"Сравниваются два элемента: {array[j]} и {array[j + 1]}");
+                            queueSort.Add($"Сравниваются два элемента: {array[j]} и {array[j + 1]}");
                         }
                         Swap(ref array[j], ref array[j + 1]);
 
@@ -86,20 +109,29 @@ namespace Laba1
                 }
                 lock (queueSort)
                 {
-                    queueSort.Enqueue($"Результат итерации {GetArrayAsAString(array)}");
+                    queueSort.Add($"Результат итерации {GetArrayAsAString(array)}");
                 }
             }
             sw.Stop();
             lock (queueSort)
             {
-                queueSort.Enqueue($"|Сортировка пузырьком окончена. Время: {sw.ElapsedTicks} тиков или {sw.ElapsedMilliseconds} миллисекунд\n");
+                queueSort.Add($"|Сортировка пузырьком окончена. Время: {sw.ElapsedTicks} тиков или {sw.ElapsedMilliseconds} миллисекунд\n");
             }
             
         }
         public static void ShakerSort<T>(T[] array) where T : IComparable<T>
         {
+            Stopwatch sw = Stopwatch.StartNew();
+            lock (queueSort)
+            {
+                queueSort.Add($"|Сортировка шейкером {array.Length} начата\n");
+            }
+            
+
             for (var i = 0; i < array.Length / 2; i++)
             {
+                
+
                 var swapFlag = false;
                 //проход слева направо
                 for (var j = i; j < array.Length - i - 1; j++)
@@ -127,6 +159,11 @@ namespace Laba1
                     break;
                 }
             }
+            sw.Stop();
+            lock (queueSort)
+            {
+                queueSort.Add($"|Сортировка шейкером окончена. Время: {sw.ElapsedTicks} тиков или {sw.ElapsedMilliseconds} миллисекунд\n");
+            }
         }
         public static void Swap<T>(ref T t1, ref T t2) where T : IComparable<T>
         {
@@ -144,14 +181,14 @@ namespace Laba1
             Stopwatch sw = Stopwatch.StartNew();
             lock (queueSort)
             {
-                queueSort.Enqueue($"|Сортировка слиянием {array.Length} начата\n");
+                queueSort.Add($"|Сортировка слиянием {array.Length} начата\n");
             }
             T[] buffer = new T[array.Length];
             MergeSortImp(array, buffer, 0, array.Length - 1);
             sw.Stop();
             lock (queueSort)
             {
-                queueSort.Enqueue($"|Сортировка слиянием окончена. Время: {sw.ElapsedTicks} тиков или {sw.ElapsedMilliseconds} миллисекунд");
+                queueSort.Add($"|Сортировка слиянием окончена. Время: {sw.ElapsedTicks} тиков или {sw.ElapsedMilliseconds} миллисекунд\n");
             }           
         }
         public static void MergeSortImp<T>(T[] array, T[] buffer, int l, int r) where T : IComparable<T>
@@ -161,7 +198,7 @@ namespace Laba1
                 int m = (l + r) / 2; // делю массив на 2 части
                 lock (queueSort)
                 {
-                    queueSort.Enqueue($"Произвожу деление на блоки: {GetPartOfAnArrayAsAString(array, l, m)} и {GetPartOfAnArrayAsAString(array, m + 1, r)} ");
+                    queueSort.Add($"Произвожу деление на блоки: {GetPartOfAnArrayAsAString(array, l, m)} и {GetPartOfAnArrayAsAString(array, m + 1, r)} ");
                 }
                 MergeSortImp(array, buffer, l, m); // отправляю сортироваться правую часть
                 //Log($"Результат работы над блоком {GetPartOfAnArrayAsAString(buffer, l, m)}");
@@ -189,7 +226,7 @@ namespace Laba1
                 }
                 lock (queueSort)
                 {
-                    queueSort.Enqueue($"Результат работы над блоком {GetPartOfAnArrayAsAString(buffer, l, r)}");
+                    queueSort.Add($"Результат работы над блоком {GetPartOfAnArrayAsAString(buffer, l, r)}");
                 }
                 //Log($"Результат итерации {GetArrayAsAString(array)}");
             }
@@ -200,6 +237,12 @@ namespace Laba1
 
         public static void TreeSort<T>(ref T[] array) where T : IComparable<T>
         {
+            Stopwatch sw = Stopwatch.StartNew();
+            lock (queueSort)
+            {
+                queueSort.Add($"|Сортировка деревом {array.Length} начата\n");
+            }
+
             var treeNode = new TreeNode<T>(array[0]);
             for (int i = 1; i < array.Length; i++)
             {
@@ -208,6 +251,12 @@ namespace Laba1
 
             T[] a = treeNode.Transform();
             array = a;
+
+            sw.Stop();
+            lock (queueSort)
+            {
+                queueSort.Add($"|Сортировка деревом окончена. Время: {sw.ElapsedTicks} тиков или {sw.ElapsedMilliseconds} миллисекунд\n");
+            }
             //return treeNode.Transform();
         }
 
@@ -227,14 +276,15 @@ namespace Laba1
                             lock (queueSort)
                             {
 
-                                Queue<string> temp = queueLog;
+                                List<string> temp = queueLog;
                                 queueLog = queueSort;
                                 queueSort = temp;
                             }
                         }
                         if (queueLog.Count != 0)
                         {
-                            string a = queueLog.Dequeue();
+                            string a = queueLog.FirstOrDefault();
+                            queueLog.Remove(a);
                             sw.WriteLine(a);
                             if (a!=null && a[0] == '|')
                                 sw2.WriteLine(a);
