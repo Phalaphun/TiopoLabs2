@@ -5,85 +5,66 @@ namespace Laba1
 {
     public class Program
     {
+
         static List<string> queueSort = new List<string>();
         static List<string> queueLog = new List<string>();
-        static Task sort;
-        static Task write;
+        static Thread sort;
+        static Thread write;
         static Random rnd = new Random(6284);
         static void Main(string[] args)
         {
-            //Start();
-            #region Old
-            //int[] someArray = new int[] { 1, 2, 4, 3, 8, 5, 7, 6, 9, 0 };
-            //PrintArray(someArray);
+            sort = new Thread(CheckN);
+            write = new Thread(Log);
+            sort.Start(10);
+            write.Start();
+            sort.Join();
+            write.Join();
 
+            sort = new Thread(CheckN);
+            write = new Thread(Log);
+            sort.Start(100);
+            write.Start();
+            sort.Join();
+            write.Join();
 
-            ////BubbleSort(someArray);
-            ////MergeSort(someArray);
-            ////TreeSort(ref someArray);
-            ////ShakerSort(someArray);
+            sort = new Thread(CheckN);
+            write = new Thread(Log);
+            sort.Start(1000);
+            write.Start();
+            sort.Join();
+            write.Join();
 
-            //PrintArray(someArray);
+            //sort = new Thread(CheckN);
+            //write = new Thread(Log);
+            //sort.Start(10000);
+            //write.Start();
+            //sort.Join();
+            //write.Join();
 
+        }
 
-            //double[] someArray2 = new double[] { 1, 2, 3, 4.5, 6, 0, 1.1 };
-            //PrintArray(someArray2);
-
-
-            ////BubbleSort(someArray2);
-            ////MergeSort(someArray2);
-
-
-            //PrintArray(someArray2);
-            #endregion
-            for (int j = 10; j < 10001; j*=10)
+        public static void CheckN(object obj)
+        {
+            if(obj is int num)
             {
-                int[] array1 = new int[j];
-                int[] array2 = new int[j];
-                int[] array3 = new int[j];
-                int[] array4 = new int[j];
-                for (int i = 0; i < j; i++)
+                int[] array1 = new int[num];
+                int[] array2 = new int[num];
+                int[] array3 = new int[num];
+                int[] array4 = new int[num];
+                for (int i = 0;i < num; i++)
                 {
-                    var a = rnd.Next(1,10000);
+                    var a = rnd.Next(1, 10000);
                     array1[i] = a;
                     array2[i] = a;
                     array3[i] = a;
                     array4[i] = a;
                 }
-
-                //sort = new Task(() => BubbleSort(array1));
-                //write = new Task(() => Log());
-                //sort.Start();
-                //write.Start();
-                //sort.Wait();
-                //write.Wait();
-
-                sort = new Task(() => MergeSort(array2));
-                write = new Task(() => Log());
-                sort.Start();
-                write.Start();
-                sort.Wait();
-                write.Wait();
-
-                sort = new Task(() => TreeSort(ref array3));
-                write = new Task(() => Log());
-                sort.Start();
-                write.Start();
-                sort.Wait();
-                write.Wait();
-
-
-                //sort = new Task(() => ShakerSort(array4));
-                //write = new Task(() => Log());
-                //sort.Start();
-                //write.Start();
-                //sort.Wait();
-                //write.Wait();
-
-
+                BubbleSort(array1);
+                MergeSort(array2);
+                TreeSort(ref array3);
+                ShakerSort(array4);
             }
         }
-
 
         public static void BubbleSort<T>(T[] array) where T : IComparable<T>
         {
@@ -157,7 +138,7 @@ namespace Laba1
                 if (!swapFlag)
                 {
                     break;
-                }
+                } 
             }
             sw.Stop();
             lock (queueSort)
@@ -260,8 +241,6 @@ namespace Laba1
             //return treeNode.Transform();
         }
 
-
-
         public static void Log()
         {
 #if !StopLog
@@ -281,7 +260,7 @@ namespace Laba1
                                 queueSort = temp;
                             }
                         }
-                        if (queueLog.Count != 0)
+                        if (queueLog.Count != 0) 
                         {
                             string a = queueLog.FirstOrDefault();
                             queueLog.Remove(a);
@@ -289,7 +268,7 @@ namespace Laba1
                             if (a!=null && a[0] == '|')
                                 sw2.WriteLine(a);
                         }
-                        if (sort.IsCompleted & queueLog.Count == 0)
+                        if (!sort.IsAlive & queueLog.Count == 0)
                         {
                             sw.Close();
                             sw2.Close();
@@ -323,8 +302,8 @@ namespace Laba1
             Console.WriteLine(GetArrayAsAString(array));
         }
 
-        
 
+        #region testThreadsTasks
         //static void Start()
         //{
         //    Init();
@@ -343,7 +322,7 @@ namespace Laba1
         //        {
         //            lock (queueZapis)
         //            {
-                        
+
         //                Queue<string> temp = queueChenie;
         //                queueChenie = queueZapis;
         //                queueZapis = temp;      
@@ -386,6 +365,7 @@ namespace Laba1
         //    b.Start();
         //    a.Start();
         //}
+        #endregion
     }
 
 }
