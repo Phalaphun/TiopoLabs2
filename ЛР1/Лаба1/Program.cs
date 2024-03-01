@@ -183,7 +183,6 @@ namespace Laba1
                 int k = l;
                 for (int i = l, j = m + 1; i <= m || j <= r;) // сращиваю левую и правую часть
                 {
-                    //Log($"Сравниваются два элемента: {array[i]} и {array[j]}");
                     if (j > r || (i <= m && array[i].CompareTo(array[j]) < 0))
                     {
                         buffer[k] = array[i];
@@ -225,7 +224,7 @@ namespace Laba1
                 treeNode.Insert(new TreeNode<T>(array[i]));
             }
 
-            T[] a = treeNode.Transform();
+            T[] a = treeNode.GetArray();
             array = a;
 
             sw.Stop();

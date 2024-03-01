@@ -11,13 +11,10 @@
         //данные
         public T Data { get; set; }
 
-        //левая ветка дерева
         public TreeNode<T> Left { get; set; }
 
-        //правая ветка дерева
         public TreeNode<T> Right { get; set; }
 
-        //рекурсивное добавление узла в дерево
         public void Insert(TreeNode<T> node)
         {
             if (node.Data.CompareTo(Data) < 0)// node.Data < Data
@@ -44,8 +41,7 @@
             }
         }
 
-        //преобразование дерева в отсортированный массив
-        public T[] Transform(List<T> elements = null)
+        public T[] GetArray(List<T> elements = null)
         {
             if (elements == null)
             {
@@ -54,14 +50,14 @@
 
             if (Left != null)
             {
-                Left.Transform(elements);
+                Left.GetArray(elements);
             }
 
             elements.Add(Data);
 
             if (Right != null)
             {
-                Right.Transform(elements);
+                Right.GetArray(elements);
             }
 
             return elements.ToArray();
@@ -70,7 +66,6 @@
 
     class TestTreeNode
     {
-        //метод для сортировки с помощью бинарного дерева (мб это бинарная сортировка)
         public static T[] TreeSort<T>(T[] array) where T:IComparable<T>
         {
             var treeNode = new TreeNode<T>(array[0]);
@@ -79,10 +74,10 @@
                 treeNode.Insert(new TreeNode<T>(array[i]));
             }
 
-            return treeNode.Transform();
+            return treeNode.GetArray();
         }
 
-        static void Start()
+        static void Test()
         {
             Console.Write("n = ");
             var n = int.Parse(Console.ReadLine());
@@ -94,9 +89,9 @@
                 a[i] = random.Next(0, 100);
             }
 
-            Console.WriteLine("Random Array: {0}", string.Join(" ", a));
+            Console.WriteLine("Массивчик: {0}", String.Join(" ", a));
 
-            Console.WriteLine("Sorted Array: {0}", string.Join(" ", TreeSort(a)));
+            Console.WriteLine("Великий Си Масивчик: {0}", String.Join(" ", TreeSort(a)));
         }
     }
 }
